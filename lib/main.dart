@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -96,7 +97,7 @@ class TodoListState extends State<TodoList> {
 
   void editTask(int index) async{
     String editedToDo = await Navigator.push(context, MaterialPageRoute(builder: (context) => AddScreen(taskToEdit: _todoItems[index],)));
-    _todoItems[index] = editedToDo;
+    _todoItems[index] = editedToDo != null ? editedToDo : _todoItems[index];
   }
 
   void markAsDone(int index) {
