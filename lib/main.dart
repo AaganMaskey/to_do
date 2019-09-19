@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/add_screen.dart';
 
+import 'model/note.dart';
+
 void main() => runApp(TodoApp());
 
 class TodoApp extends StatelessWidget {
@@ -20,7 +22,7 @@ class TodoList extends StatefulWidget {
 }
 
 class TodoListState extends State<TodoList> {
-  List<String> _todoItems = [];
+  List<Note> _todoItems = [];
 
   List _colorList = [];
   var _random;
@@ -34,8 +36,9 @@ class TodoListState extends State<TodoList> {
 
   void _addTodoItem(String toDo) {
     if (toDo.length > 0) {
+      Note note = Note(title: toDo, status: false);
       setState(() {
-        _todoItems.add(toDo);
+        _todoItems.add(note);
       });
     }
   }
@@ -72,18 +75,19 @@ class TodoListState extends State<TodoList> {
               itemCount: _todoItems.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
-                  onHorizontalDragStart: (_) => markAsDone(index),
+                  onHorizontalDragStart: (_) => removeItem(index),
                   child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     decoration: BoxDecoration(
                       color: _colorList[_random.nextInt(_colorList.length)],
-                      borderRadius: BorderRadius.circular(10.0)
+                      borderRadius: BorderRadius .circular(10.0)
                     ),
                     padding: EdgeInsets.all(16.0),
                     child: ListTile(
                       onTap: () => editTask(index),
                       onLongPress: () => markAsDone(index),
-                      title: Text(_todoItems[index], style: TextStyle(color: Colors.white, fontSize: 18.0),),
+                      title: Text(_todoItems[index].title, style: TextStyle(color: Colors.white, fontSize: 18.0),),
+                      trailing: Icon(Icons.check_circle, color: _todoItems[index].status ? Colors.green : Colors.white,),
                     ),
                   ),
                 );
@@ -96,8 +100,15 @@ class TodoListState extends State<TodoList> {
   }
 
   void editTask(int index) async{
-    String editedToDo = await Navigator.push(context, MaterialPageRoute(builder: (context) => AddScreen(taskToEdit: _todoItems[index],)));
+    String editedToDo = await Navigator.push(context, MaterialPageRoute(builder: (context) => AddScreen(taskToEdit: _todoItems[index].title,)));
     _todoItems[index] = editedToDo != null ? editedToDo : _todoItems[index];
+  }
+
+
+  void removeItem(int index){
+    setState(() {
+      _todoItems.removeAt(index);
+    });
   }
 
   void markAsDone(int index) {
@@ -105,7 +116,7 @@ class TodoListState extends State<TodoList> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Mark as done???"),
+            title: Text(_todoItems[index].status ? "Mark as Undone???" : "Mark as Done???"),
             content: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -118,7 +129,7 @@ class TodoListState extends State<TodoList> {
                   child: Text("Yes"),
                   onPressed: () {
                     setState(() {
-                      _todoItems.removeAt(index);
+                      _todoItems[index].status = !_todoItems[index].status;
                       Navigator.pop(context);
                     });
                   },
