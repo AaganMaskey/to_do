@@ -101,7 +101,8 @@ class TodoListState extends State<TodoList> {
 
   void editTask(int index) async{
     String editedToDo = await Navigator.push(context, MaterialPageRoute(builder: (context) => AddScreen(taskToEdit: _todoItems[index].title,)));
-    _todoItems[index] = editedToDo != null ? editedToDo : _todoItems[index];
+    _todoItems[index].title = editedToDo != null ? editedToDo : _todoItems[index];
+    _todoItems[index].status= false;
   }
 
 
